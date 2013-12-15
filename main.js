@@ -257,7 +257,7 @@ Math.easeInOutCubic = function (t, b, c, d) {
 			clearTimeout(timeout);
 			g.chains.draw.remove(draw);
 		}
-	})();
+	})/*disabled*/;
 
 	// Camera
 	(function() {
