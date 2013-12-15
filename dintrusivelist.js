@@ -36,7 +36,9 @@ define(function() {
 		this.remove(this.root);
 	};
 	p.remove = function(o) {
-		if (!(this._nextProp in o)) { throw "Not in list"; }
+		if (!(this._nextProp in o)) {
+			throw "Not in list";
+		}
 		var prev = o[this._prevProp];
 		var next = o[this._nextProp];
 		if (this.root === o) {

@@ -36,5 +36,10 @@ define(function() {
 			g.mouse.y = getY(event);
 			g.emit('mousemove', g.mouse.x, g.mouse.y);
 		},true);
+		g.canvas.addEventListener('mousewheel', function(event) {
+			g.mouse.x = getX(event);
+			g.mouse.y = getY(event);
+			g.emit('mousewheel', event.deltaY, g.mouse.x, g.mouse.y);
+		},true);
 	};
 });

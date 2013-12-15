@@ -7,7 +7,7 @@ define(function() {
 				if (this.level.disable) { this.level.disable(); }
 			}
 			g.emit('levelunloaded');
-			this.level = level;
+			this.level = level();
 			if (this.level) {
 				this.level.objects.forEach(function(c) { g.objects.add(c); console.log(c); });
 				if (this.level.enable) { this.level.enable(); }

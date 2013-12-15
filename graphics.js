@@ -154,9 +154,11 @@ define(function() {
 			this.context.drawImage.apply(this.context,arguments);
 		}
 	};
-	p.drawCenteredImage = function(img,x,y) {
+	p.drawCenteredImage = function(img,x,y,w,h) {
 		if (img) {
-			this.context.drawImage(img,x-img.width/2,y-img.height/2);
+			w = w === undefined ? img.width : w;
+			h = h === undefined ? img.height : h;
+			this.context.drawImage(img,x-w/2,y-h/2,w,h);
 		}
 	};
 	p.fillCenteredText = function(text,x,y) {
