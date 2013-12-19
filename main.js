@@ -7,7 +7,8 @@ define(['platform','game','vector','staticcollidable','linesegment','editor','re
 		          ,'person_business','person_lady','person_boy','person_guy',
 		          ,'background','yousavedtheday','thanksforplaying'
 		          ,'box64','box128','beam128','beam256','beam512','triangle64','stairs64'
-		          ,'table','chair'],
+		          ,'table','chair'
+		          ,'0','1','2','3','4','5','6','7','8','9','colon'],
 		'audio': ['jump01','jump02','jump03','jump04',
 				  'yay01','yay02','yay03','yay04','yay05','yay06','yay07',
 				  'heart01','heart02','heart03','heart04',
@@ -720,16 +721,39 @@ Math.easeInOutCubic = function (t, b, c, d) {
 	var PatientInNeed = createLevelItem(Person,'PatientInNeed',images.patient,{needsHeart: true});
 	var PatientWithHeart = createLevelItem(Person,'PatientWithHeart',images.patient,{hasHeart: true});
 
+	function drawNumber(g,x,y,number,digits) {
+		while(number !== 0 || digits > 0) {
+			var n = (number | 0) % 10;
+			number = (number / 10) | 0;
+			g.drawCenteredImage(images[n.toString()],x,y);
+			x -= 60;
+			digits--;
+		}
+		return x;
+	}
+
+	function drawTime(g,x,y,time) {
+		var minutes = time / 60 | 0;
+		var seconds = (time - minutes * 60) | 0;
+		x = drawNumber(g,x,y,seconds,2);
+		x += 20;
+		g.drawCenteredImage(images.colon,x,y);
+		x -= 40;
+		x = drawNumber(g,x,y,minutes,1);
+		return x;
+	}
+
 	//#states
 	function gameplayState() {
 		var me = {
 			enabled: false,
 			enable: enable,
-			disable: disable
+			disable: disable,
+			time: 0
 		};
 		function enable() {
 			g.chains.update.push(update);
-			g.chains.draw.push(draw);
+			g.chains.draw.insertBefore(draw,g.chains.draw.camera);
 			g.on('keydown',keydown);
 		}
 		function disable() {
@@ -738,6 +762,8 @@ Math.easeInOutCubic = function (t, b, c, d) {
 		}
 
 		function update(dt,next) {
+			me.time += dt;
+
 			// Post update
 			game.world.Step(dt, 3, 2);
 
@@ -749,14 +775,18 @@ Math.easeInOutCubic = function (t, b, c, d) {
 			if (allSatisfied) {
 				player.image = images.player_happy;
 				playYay();
-				g.changeState(winState());
+				g.changeState(winState({
+					time: me.time
+				}));
 			}
 
 			next(dt);
 		}
+
 		function draw(g,next) {
 			// Draw HUD
 			next(g);
+			drawTime(g,750,50,me.time);
 		}
 		function keydown(button) {
 			if (button === 'r') {
@@ -767,7 +797,7 @@ Math.easeInOutCubic = function (t, b, c, d) {
 		return me;
 	}
 
-	function winState() {
+	function winState(winattributes) {
 		var me = {
 			enabled: false,
 			enable: enable,
@@ -791,6 +821,8 @@ Math.easeInOutCubic = function (t, b, c, d) {
 
 			next(dt);
 		}
+
+		var timeOffsetX=0;
 		function draw(g,next) {
 			// Draw HUD
 			next(g);
@@ -798,6 +830,15 @@ Math.easeInOutCubic = function (t, b, c, d) {
 			g.context.globalAlpha = Math.easeInOutCubic(t,0.0,1.0,2);
 			g.drawCenteredImage(images.yousavedtheday,400,Math.easeInOutCubic(t,700,-200,2));
 			g.context.globalAlpha = 1;
+
+
+			var st = 1+Math.sin(time*10)/6;
+			var rt = Math.sin(time*13)*Math.PI*0.05;
+			var tt = (Math.cos(time)+1)*0.5 * timeOffsetX;
+			console.log(timeOffsetX);
+			g.scalerotate(750-tt,50,st,st,rt,function() {
+				timeOffsetX = 750 - drawTime(g,750,50,winattributes.time) - 100;
+			});
 		}
 		function keydown(button) {
 			if (['space','enter'].indexOf(button) >= 0) {
